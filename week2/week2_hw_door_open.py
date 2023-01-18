@@ -33,7 +33,6 @@ class ROS_sub():
 
     def _depth_callback(self, data):
         self.depth_image = self.bridge.imgmsg_to_cv2(data, "32FC1")
-        print(self.depth_image[240][320])
 
 
 
