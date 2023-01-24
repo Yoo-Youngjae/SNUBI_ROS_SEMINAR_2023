@@ -10,14 +10,12 @@ class HSR_sub():
                  lidar_topic='/hsrb/base_scan',
                  rgb_topic='/hsrb/head_rgbd_sensor/rgb/image_raw',
                  depth_topic='/hsrb/head_rgbd_sensor/depth_registered/image_raw',
-                 pc_topic='/hsrb/head_rgbd_sensor/depth_registered/rectified_points',
-                 threshold_dist=0.5):
+                 pc_topic='/hsrb/head_rgbd_sensor/depth_registered/rectified_points'):
         self.rgb_sub = rospy.Subscriber(rgb_topic, Image, self._rgb_callback)
         self.depth_sub = rospy.Subscriber(depth_topic, Image, self._depth_callback)
         self.lidar_sub = rospy.Subscriber(lidar_topic, LaserScan, self._lidar_callback)
         self._pc_sub = rospy.Subscriber(pc_topic, PointCloud2, self._pc_callback)
 
-        self.threshold_dist = threshold_dist
         self.dist = None
         self.rgb_img = None
         self.depth_img = None
