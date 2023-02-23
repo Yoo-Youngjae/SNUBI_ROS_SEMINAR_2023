@@ -25,8 +25,9 @@ class HSR_sub():
 
 
     def _rgb_callback(self, data):
+        rospy.loginfo(self.dist)
         self.rgb_img = cv2.cvtColor(np.frombuffer(data.data, dtype=np.uint8).reshape(data.height, data.width, -1), cv2.COLOR_RGB2BGR)
-        cv2.putText(self.rgb_img, "Table edge length: ".format(self.dist), \
+        cv2.putText(self.rgb_img, "Table edge length: {fname: .3f}".format(fname=self.dist/1000), \
                     (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, \
                     (0, 255, 0), 3)
         cv2.imshow("rgb_img", self.rgb_img)
@@ -34,6 +35,13 @@ class HSR_sub():
 
     def _depth_callback(self, data):
         self.depth_image = self.bridge.imgmsg_to_cv2(data, "32FC1") # [mm]
+        width = 640
+        height = 480
+
+        roi_image = self.depth_image[height // 4: height // 2, width // 4: width * 3 // 4].reshape(-1)
+        # remove outliers which is detected as "0.0"
+        roi_inliers = roi_image[roi_image > .01]
+        self.dist = roi_inliers.min()
 
     def _pc_callback(self, data):
         self.pc = ros_numpy.numpify(data)
@@ -56,5 +64,4 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         if hsr_sub.pc is None:
             continue
-        pc = np.array(hsr_sub.pc.tolist()).reshape(image_resolution[0], image_resolution[1], -1) #[m]
         rate.sleep()
